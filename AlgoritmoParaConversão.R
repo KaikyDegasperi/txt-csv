@@ -1,0 +1,73 @@
+#criando objetos
+nome <- 0
+
+nomeArquivo <- 0
+
+arquivo <- 0
+
+arquivos <- 0
+
+#laço de repetição que vai percorrer os arquivos 
+
+# coloque a quantidade de arquivos txt existentes no diretório
+for(i in 1:5){
+  #nomeie os arquvios de acordo com a lógica: Exemplo nome1, nome2...
+  
+  #gerando nomes dos arquivos
+  
+  nome[i] <- paste('nome',i,'.txt')
+  
+  #tirando os espaços
+  
+  nomeArquivo[i] <- gsub(" ","",nome[i])
+  
+  #armazenando arquivos em um vetor
+  
+  arquivos <- list.files( full.names = T, pattern = nomeArquivo[i])
+  
+  # separar um dos arquivos
+  arquivo <- arquivos
+  
+  # importar arquivo
+  tmp <- readLines(arquivo)
+  
+  # colapsar texto do arquivo
+  tmp <- paste0(tmp, collapse = ' ')
+  
+  # limpar excesso de espacos
+  tmp <- gsub(
+    pattern = '\\s+', 
+    replacement = ' ', 
+    x = tmp
+  )
+  
+  # remover os indicadores de quebra de linha \n
+  tmp <- gsub(pattern = '\n', replacement = ' ', x = tmp)
+  
+  # separar as questoes
+  tmp <- strsplit(x = tmp, split = 'QUESTÃO [0-9]{1,3}')
+  
+  # sair do formato de lista
+  tmp <- unlist(tmp)
+  
+  # remover os espacos finais de cada entrada
+  tmp <- trimws(tmp)
+  
+  # removendo entradas vazias
+  tmp <- tmp[nchar(tmp) > 1]
+  
+  # consolidar resultados
+  db <- cbind.data.frame(
+    arquivo = arquivo,
+    texto = tmp,
+    competencia = '',
+    habilidade = ''
+  )
+  
+  # salvar
+  write.csv2(
+    x = db, 
+    file = paste('prova',i,'.csv'), 
+    row.names = F
+  )
+}
